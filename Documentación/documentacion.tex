@@ -1,0 +1,371 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage[margin=3cm]{geometry}
+\usepackage{subcaption}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-tabla]{babel}
+
+\usepackage{href-ul}
+\usepackage{tcolorbox}
+\usepackage{listings}
+\usepackage{tocloft}
+\usepackage[table]{xcolor}
+\usepackage{booktabs}
+
+\renewcommand{\contentsname}{Índice}
+\renewcommand{\cfttoctitlefont}{\Huge\bfseries}
+\renewcommand{\cftdotsep}{1}
+
+
+
+\begin{document}
+
+    % ================================= PORTADA =========================================
+    \begin{titlepage}
+        \centering
+
+        {\Large \textbf{Programación Multimedia y Dispositivos Móviles}\par}
+        
+        \vspace{2cm}
+        {\Huge \textbf{Documentación API dockerizada}\par}
+        \vspace{0.5cm}
+        {\LARGE Servidor Backend con Express y MongoDB\par}
+        
+        \vspace{2cm}
+        \noindent\rule{10cm}{0.4pt}
+        
+        \vspace{2cm}
+        {\Large \textbf{Autor:}\par}
+        \vspace{0.3cm}
+        {\large Santi Martínez\par}
+        
+        \vspace{10cm}
+        {\large \today}
+        
+    \end{titlepage}
+
+    \newpage
+    \tableofcontents
+
+    % ================================= INTRODUCCIÓN
+    \newpage
+    \section{Introducción}
+
+        \subsection{Contexto del proyecto}
+
+            Este proyecto aborda la dockerización de una API REST desarrollada con Node.js y Express, que utiliza MongoDB como sistema de gestión de base de datos. La API implementa funcionalidades de gestión de usuarios y grupos.
+
+            La aplicación se compone de dos servicios principales que deben funcionar de manera coordinada: el servidor de aplicación que expone los endpoints REST y la base de datos MongoDB que persiste la información.
+            
+            La dockerización de estos componentes permite encapsular cada servicio en contenedores independientes, facilitando su gestión, despliegue y mantenimiento.
+
+        \subsection{Objetivos de la dockerización}
+
+            Los principales objetivos para realizar la dockerización de la API son los siguientes:
+
+            \begin{itemize}
+                \item \textbf{Consistencia:} Permite la ejecución del entorno en cualquier ordenador preparado para ejecutar Docker; es decir, funciona de manera autónoma, llevando todo lo necesario en su interior y operando desde ahí, de forma similar a un caballo de Troya.
+
+                \item \textbf{Aislamiento de componentes:} Cada servicio (API y MongoDB) se ejecuta en su propio contenedor con su propio sistema de archivos, procesos y red, evitando conflictos de dependencias.
+
+                \item \textbf{Portabilidad:} Permitir que la aplicación se ejecute de manera consistente en cualquier sistema operativo (Windows, macOS, Linux).
+
+                \item \textbf{Simplificación del despliegue:} Reducir el proceso de instalación y configuración.
+
+                \item \textbf{Escalabilidad:} Permite crear varias copias de un servicio para que se pueda ejecutar en varios lugares al mismo tiempo.
+                
+                \item \textbf{Gestión de dependencias:} Encapsular todas las dependencias que usa la API (mongoose, express, dotenv, etc ...) de la aplicación dentro de la imagen Docker, garantizando que siempre se mantengan correctas.
+            \end{itemize}
+
+
+        \subsection{Tecnologías utilizadas}
+
+            El conjunto de tecnologías utilizado es el siguiente:
+
+            \begin{itemize}
+                \item \textbf{Node.js 20:} Entorno de ejecución de JavaScript del lado del servidor.
+
+                \item \textbf{Express.js:} Framework de Node para la realización de servidores.
+
+                \item \textbf{MongoDB 6:} Base de datos NoSQL orientada a documentos.
+
+                \item \textbf{Mongoose:} ODM (Object Document Mapper) que permite que Node.js se comunique y gestione datos en MongoDB.
+
+                \item \textbf{Docker:} Plataforma de contenedorización que permite empaquetar aplicaciones con todas sus dependencias en contenedores estandarizados. Proporciona un aislamiento ligero y eficiente.
+
+                \item \textbf{Docker Compose:} Herramienta de docker para orquestar varios contenedores a la vez. Permite configurar todos los servicios, redes y volúmenes de la aplicación en un único archivo YML (docker-compose.yml).
+
+                \item \textbf{Variables de entorno:} Variables de configuración del programa, guardadas de forma privada en un .env.
+            \end{itemize}
+
+
+            La combinación de estas tecnologías crea un ecosistema robusto, escalable y fácil de mantener.
+
+
+    % ================================= FUNDAMENTOS TEÓRICOS
+    \newpage
+    \section{Fundamentos teóricos}
+
+        \subsection{¿Qué es Docker?}
+            Es una plataforma que ejecuta aplicaciones en contenedores, asegurando que su funcionamiento sea el correcto en cualquier sistema.
+
+            \vspace{0.3cm}
+            \textbf{Docker corre principalmente sobre Linux}, porque utiliza cacterísticas del kernel de Linux para los contenedores.
+            \begin{itemize}
+                \item En \textbf{Linux}, se ejecuta de \underline{forma nativa}.
+                \item En \textbf{Windows} o \textbf{Mac}, usa una \underline{máquina virtual ligera con Linux} para poder correr contenedores.
+            \end{itemize}
+
+        \subsection{Contenedores vs Máquinas Virtuales}
+
+            \begin{table}[h!]
+                \centering
+                \rowcolors{2}{white}{blue!15}
+                \begin{tabular}{@{} l l l @{}}
+                    \toprule
+                    \textbf{Características} & \textbf{Contenedor} & \textbf{Máquina Virtual (VM)} \\
+                    \midrule
+                    Sistema operativo & Comparte el SO del host & Cada VM tiene su propio SO completo \\
+                    Peso & Ligero, rápido de iniciar & Pesado, tarda más en iniciar \\
+                    Recursos & Usa solo lo necesario & Consume más recursos, reserva CPU/RAM \\
+                    Aislamiento & Aislado a nivel de procesos & Aislado a nivel de hardware virtual \\
+                    Portabilidad & Muy portable & Menos portable \\
+                    \bottomrule
+                \end{tabular}
+                \caption{Comparación entre contenedores y máquinas virtuales}
+            \end{table}
+
+
+        \subsection{Conceptos clave}
+        
+            Para una mayor comprensión de la utilización de Docker, hay que analizar también unos conceptos principales; estos son de vital importancia:
+
+            \begin{itemize}
+                \item \textbf{Imágenes}: Plantilla que contiene todo lo necessario para ejecutar una aplicación perfectamente (Mongo, Ubuntu, Odoo, ...)
+                \item \textbf{Contenedores}: Instancia de una imagen, la cual se encuentra aislada.
+                \item \textbf{Volúmenes}: Almacenamiento persistente que conserva datos fuera del contenedor. Básicamente, en el caso de eliminar el contenedor por lo que sea, los datos guardados en el volumen siguen existiendo en el host. Se utiliza para datos importantes.
+                \item \textbf{Redes}: Medio que permite la comunicación entre contederores y el exterior. Por ejemplo a la hora de realizar manualmente ejecutarse a un contenedor, la parte del comando \texttt{-p 3000:3000}, el primer puerto es del host y el segundo del contenedor, eso hace que ambos se comuniquen.
+            \end{itemize}
+
+        \subsection{Docker Compose}
+
+                Docker Compose es una herramienta que permite orquestar varios contenedores mediante un archivo de configuración (\textbf{docker-compose.yml}). Facilita levantar, detener y administrar varios contenedores juntos, incluyendo servicios, redes y volúmenes.
+
+
+    % ================================= ARQUITECTURA
+    \newpage
+    \section{Arquitectura}
+
+        \subsection{Descripción de la API}
+
+        \subsection{Componentes del sistema}
+
+        \subsection{Diagrama de arquitectura}
+
+        \subsection{Flujo de comunicación}
+
+    
+    % ================================= ANÁLISIS DEL CÓDIGO FUENTE
+    \newpage
+    \section{Análisis del código fuente}
+
+        \subsection{Estructura del proyecto}
+
+        \subsection{Servidor Express (app.js)}
+
+        \subsection{Dependencias y paquetes}
+
+        \subsection{Configuración de MongoDB}
+
+
+    % ================================= DOCKERFILE: CONSTRUCCIÓN DE LA IMAGEN
+    \newpage
+    \section{Dockerfile: Construcción de la imagen}
+
+        \subsection{Análisis del Dockerfile}
+
+        \subsection{Imagen base (FROM)}
+
+        \subsection{Directorio de trabajo (WORKDIR)}
+
+        \subsection{Instalación de dependencias}
+
+        \subsection{Copia de archivos}
+
+        \subsection{Exposición de puertos}
+
+        \subsection{Comando de inicio (CMD)}
+
+        \subsection{Buenas prácticas aplicadas}
+
+    
+    % ================================= DOCKER COMPSE: ORQUESTACIÓN DE SERVICIOS
+    \newpage
+    \section{Docker Compose: Orquestación de servicios}
+
+        \subsection{Estructura del archivo docker-compose.yml}
+
+        \subsection{Servicio API}
+        % build, container_name, ports, environment, depends_on
+
+        \subsection{Servicio MongoDB}
+        % image, ports, environment, volumes
+
+        \subsection{Configuración de volúmenes}
+
+        \subsection{Variables de entorno}
+
+        \subsection{Dependencias entre servicios}
+
+
+    % ================================= GESTIÓN DE VARIABLES DE ENTORNO
+    \newpage
+    \section{Gestión de variables de entorno}
+
+        \subsection{Archivo .env}
+
+        \subsection{Variables de configuración de MongoDB}
+
+        \subsection{URI de conexión}
+
+        \subsection{Seguridad y buenas prácticas}
+
+
+    % ================================= PROCESO DE DOCKERIZACIÓN
+    \newpage
+    \section{Proceso de dockerización}
+
+        \subsection{Preparación del entorno}
+
+        \subsection{Construcción de la imagen}
+
+        \subsection{Creación y ejecución de contenedores}
+
+        \subsection{Verificación del funcionamiento}
+
+
+    % ================================= COMANDOS DOCKER ÚTILES
+    \newpage
+    \section{Comandos Docker útiles}
+
+        \subsection{Comandos básicos}
+
+        \subsection{Gestión de imágenes}
+
+        \subsection{Gestión de contenedores}
+
+        \subsection{Docker Compose CLI}
+
+        \subsection{Comandos de depuración}
+
+
+    % ================================= REDES Y COMUNICACIÓN
+    \newpage
+    \section{Redes y comunicación}
+
+        \subsection{Red por defecto de Docker Compose}
+
+        \subsection{Resolución de nombres DNS}
+
+        \subsection{Comunicación entre contenedores}
+
+
+    % ================================= PERISISTENCIA DE DATOS
+    \newpage
+    \section{Persistencia de datos}
+
+        \subsection{Volúmenes en Docker}
+
+        \subsection{Volumen mongo\_data}
+
+        \subsection{Backup y recuperación}
+
+
+    % ================================= PRUEBAS Y VALIDACIÓN
+    \newpage
+    \section{Pruebas y validación}
+
+        \subsection{Verificación de contenedores activos}
+
+        \subsection{Pruebas de conectividad}
+
+        \subsection{Pruebas de endpoints}
+
+        \subsection{Logs y monitorización}
+        
+
+    % ================================= OPTIMIZACIONES Y MEJORAS
+    \newpage
+    \section{Optimizaciones y mejoras}
+
+        \subsection{Optimización del Dockerfile}
+
+        \subsection{Multi-stage builds}
+
+        \subsection{Reducción del tamaño de la imagen}
+
+        \subsection{Cache de capas}
+
+
+    % ================================= SEGUIRDAD
+    \newpage
+    \section{Seguridad}
+
+        \subsection{Gestión de secretos}
+
+        \subsection{Usuarios no privilegiados}
+
+        \subsection{Escaneo de vulnerabilidades}
+
+        \subsection{Actualización de imágenes base}
+
+
+    % ================================= DESPLIEGUE EN PRODUCCIÓN
+    \newpage
+    \section{Despliegue en producción}
+
+        \subsection{Diferencias con desarrollo}
+
+        \subsection{Configuración para producción}
+
+        \subsection{Escalabilidad}
+
+        \subsection{Herramientas de orquestación}
+
+
+    % ================================= TROUBLESHOOTING
+    \newpage
+    \section{Troubleshooting}
+
+        \subsection{Problemas comunes}
+
+        \subsection{Errores de conexión}
+
+        \subsection{Problemas de permisos}
+
+        \subsection{Debugging de contenedores}
+
+
+    % ================================= CONCLUSIONES
+    \newpage
+    \section{Conclusiones}
+
+        \subsection{Ventajas de la dockerización}
+
+        \subsection{Resultados obtenidos}
+
+        \subsection{Trabajo futuro}
+
+
+    % ================================= REFERENCIAS
+    \newpage
+    \section{Referencias}
+
+        \subsection{Documentación oficial}
+
+        \subsection{Recursos adicionales}
+
+
+\end{document}

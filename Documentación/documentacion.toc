@@ -1,0 +1,92 @@
+\babel@toc {spanish}{}\relax 
+\contentsline {section}{\numberline {1}Introducción}{4}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Contexto del proyecto}{4}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Objetivos de la dockerización}{4}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}Tecnologías utilizadas}{4}{subsection.1.3}%
+\contentsline {section}{\numberline {2}Fundamentos teóricos}{5}{section.2}%
+\contentsline {subsection}{\numberline {2.1}¿Qué es Docker?}{5}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Contenedores vs Máquinas Virtuales}{5}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Conceptos clave}{5}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Docker Compose}{5}{subsection.2.4}%
+\contentsline {section}{\numberline {3}Arquitectura}{6}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Descripción de la API}{6}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Componentes del sistema}{6}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Diagrama de arquitectura}{6}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}Flujo de comunicación}{6}{subsection.3.4}%
+\contentsline {section}{\numberline {4}Análisis del código fuente}{7}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Estructura del proyecto}{7}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Servidor Express (app.js)}{7}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Dependencias y paquetes}{7}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4}Configuración de MongoDB}{7}{subsection.4.4}%
+\contentsline {section}{\numberline {5}Dockerfile: Construcción de la imagen}{8}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Análisis del Dockerfile}{8}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Imagen base (FROM)}{8}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}Directorio de trabajo (WORKDIR)}{8}{subsection.5.3}%
+\contentsline {subsection}{\numberline {5.4}Instalación de dependencias}{8}{subsection.5.4}%
+\contentsline {subsection}{\numberline {5.5}Copia de archivos}{8}{subsection.5.5}%
+\contentsline {subsection}{\numberline {5.6}Exposición de puertos}{8}{subsection.5.6}%
+\contentsline {subsection}{\numberline {5.7}Comando de inicio (CMD)}{8}{subsection.5.7}%
+\contentsline {subsection}{\numberline {5.8}Buenas prácticas aplicadas}{8}{subsection.5.8}%
+\contentsline {section}{\numberline {6}Docker Compose: Orquestación de servicios}{9}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Estructura del archivo docker-compose.yml}{9}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Servicio API}{9}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3}Servicio MongoDB}{9}{subsection.6.3}%
+\contentsline {subsection}{\numberline {6.4}Configuración de volúmenes}{9}{subsection.6.4}%
+\contentsline {subsection}{\numberline {6.5}Variables de entorno}{9}{subsection.6.5}%
+\contentsline {subsection}{\numberline {6.6}Dependencias entre servicios}{9}{subsection.6.6}%
+\contentsline {section}{\numberline {7}Gestión de variables de entorno}{10}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Archivo .env}{10}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}Variables de configuración de MongoDB}{10}{subsection.7.2}%
+\contentsline {subsection}{\numberline {7.3}URI de conexión}{10}{subsection.7.3}%
+\contentsline {subsection}{\numberline {7.4}Seguridad y buenas prácticas}{10}{subsection.7.4}%
+\contentsline {section}{\numberline {8}Proceso de dockerización}{11}{section.8}%
+\contentsline {subsection}{\numberline {8.1}Preparación del entorno}{11}{subsection.8.1}%
+\contentsline {subsection}{\numberline {8.2}Construcción de la imagen}{11}{subsection.8.2}%
+\contentsline {subsection}{\numberline {8.3}Creación y ejecución de contenedores}{11}{subsection.8.3}%
+\contentsline {subsection}{\numberline {8.4}Verificación del funcionamiento}{11}{subsection.8.4}%
+\contentsline {section}{\numberline {9}Comandos Docker útiles}{12}{section.9}%
+\contentsline {subsection}{\numberline {9.1}Comandos básicos}{12}{subsection.9.1}%
+\contentsline {subsection}{\numberline {9.2}Gestión de imágenes}{12}{subsection.9.2}%
+\contentsline {subsection}{\numberline {9.3}Gestión de contenedores}{12}{subsection.9.3}%
+\contentsline {subsection}{\numberline {9.4}Docker Compose CLI}{12}{subsection.9.4}%
+\contentsline {subsection}{\numberline {9.5}Comandos de depuración}{12}{subsection.9.5}%
+\contentsline {section}{\numberline {10}Redes y comunicación}{13}{section.10}%
+\contentsline {subsection}{\numberline {10.1}Red por defecto de Docker Compose}{13}{subsection.10.1}%
+\contentsline {subsection}{\numberline {10.2}Resolución de nombres DNS}{13}{subsection.10.2}%
+\contentsline {subsection}{\numberline {10.3}Comunicación entre contenedores}{13}{subsection.10.3}%
+\contentsline {section}{\numberline {11}Persistencia de datos}{14}{section.11}%
+\contentsline {subsection}{\numberline {11.1}Volúmenes en Docker}{14}{subsection.11.1}%
+\contentsline {subsection}{\numberline {11.2}Volumen mongo\_data}{14}{subsection.11.2}%
+\contentsline {subsection}{\numberline {11.3}Backup y recuperación}{14}{subsection.11.3}%
+\contentsline {section}{\numberline {12}Pruebas y validación}{15}{section.12}%
+\contentsline {subsection}{\numberline {12.1}Verificación de contenedores activos}{15}{subsection.12.1}%
+\contentsline {subsection}{\numberline {12.2}Pruebas de conectividad}{15}{subsection.12.2}%
+\contentsline {subsection}{\numberline {12.3}Pruebas de endpoints}{15}{subsection.12.3}%
+\contentsline {subsection}{\numberline {12.4}Logs y monitorización}{15}{subsection.12.4}%
+\contentsline {section}{\numberline {13}Optimizaciones y mejoras}{16}{section.13}%
+\contentsline {subsection}{\numberline {13.1}Optimización del Dockerfile}{16}{subsection.13.1}%
+\contentsline {subsection}{\numberline {13.2}Multi-stage builds}{16}{subsection.13.2}%
+\contentsline {subsection}{\numberline {13.3}Reducción del tamaño de la imagen}{16}{subsection.13.3}%
+\contentsline {subsection}{\numberline {13.4}Cache de capas}{16}{subsection.13.4}%
+\contentsline {section}{\numberline {14}Seguridad}{17}{section.14}%
+\contentsline {subsection}{\numberline {14.1}Gestión de secretos}{17}{subsection.14.1}%
+\contentsline {subsection}{\numberline {14.2}Usuarios no privilegiados}{17}{subsection.14.2}%
+\contentsline {subsection}{\numberline {14.3}Escaneo de vulnerabilidades}{17}{subsection.14.3}%
+\contentsline {subsection}{\numberline {14.4}Actualización de imágenes base}{17}{subsection.14.4}%
+\contentsline {section}{\numberline {15}Despliegue en producción}{18}{section.15}%
+\contentsline {subsection}{\numberline {15.1}Diferencias con desarrollo}{18}{subsection.15.1}%
+\contentsline {subsection}{\numberline {15.2}Configuración para producción}{18}{subsection.15.2}%
+\contentsline {subsection}{\numberline {15.3}Escalabilidad}{18}{subsection.15.3}%
+\contentsline {subsection}{\numberline {15.4}Herramientas de orquestación}{18}{subsection.15.4}%
+\contentsline {section}{\numberline {16}Troubleshooting}{19}{section.16}%
+\contentsline {subsection}{\numberline {16.1}Problemas comunes}{19}{subsection.16.1}%
+\contentsline {subsection}{\numberline {16.2}Errores de conexión}{19}{subsection.16.2}%
+\contentsline {subsection}{\numberline {16.3}Problemas de permisos}{19}{subsection.16.3}%
+\contentsline {subsection}{\numberline {16.4}Debugging de contenedores}{19}{subsection.16.4}%
+\contentsline {section}{\numberline {17}Conclusiones}{20}{section.17}%
+\contentsline {subsection}{\numberline {17.1}Ventajas de la dockerización}{20}{subsection.17.1}%
+\contentsline {subsection}{\numberline {17.2}Resultados obtenidos}{20}{subsection.17.2}%
+\contentsline {subsection}{\numberline {17.3}Trabajo futuro}{20}{subsection.17.3}%
+\contentsline {section}{\numberline {18}Referencias}{21}{section.18}%
+\contentsline {subsection}{\numberline {18.1}Documentación oficial}{21}{subsection.18.1}%
+\contentsline {subsection}{\numberline {18.2}Recursos adicionales}{21}{subsection.18.2}%
