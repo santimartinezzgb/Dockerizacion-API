@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2025.11.16)  19 NOV 2025 19:42
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2025.11.16)  26 NOV 2025 11:31
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -611,16 +611,45 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.46 ...³n del funcionamiento}{11}{subsection.8.4}
-                                                  % [1] [2])
+l.45 ...contenedores activos}{14}{subsection.10.1}
+                                                  % [1])
 \tf@toc=\write5
 \openout5 = `documentacion.toc'.
 
- [3] [4]
+ [2] [3]
 LaTeX Font Info:    Trying to load font information for T1+cmtt on input line 149.
  (/usr/share/texlive/texmf-dist/tex/latex/base/t1cmtt.fd
 File: t1cmtt.fd 2023/04/13 v2.5m Standard LaTeX font definitions
-) [5] [6] [7] [8] [9] [10] [11] [12] [13] [14] [15] [16] [17] [18] [19] [20] [21] (./documentacion.aux
+) [4]
+<images/API.png, id=408, 367.3725pt x 619.31375pt>
+File: images/API.png Graphic file (type png)
+<use images/API.png>
+Package pdftex.def Info: images/API.png  used on input line 163.
+(pdftex.def)             Requested size: 310.50357pt x 523.48024pt.
+ [5 <./images/API.png>] [6]
+<images/Dockerfile.png, id=421, 511.9125pt x 357.335pt>
+File: images/Dockerfile.png Graphic file (type png)
+<use images/Dockerfile.png>
+Package pdftex.def Info: images/Dockerfile.png  used on input line 186.
+(pdftex.def)             Requested size: 221.78923pt x 154.81789pt.
+ [7 <./images/Dockerfile.png>]
+<images/docker-compose.png, id=435, 920.43875pt x 867.24pt>
+File: images/docker-compose.png Graphic file (type png)
+<use images/docker-compose.png>
+Package pdftex.def Info: images/docker-compose.png  used on input line 212.
+(pdftex.def)             Requested size: 354.86412pt x 334.35822pt.
+ [8 <./images/docker-compose.png>]
+<images/volumes.png, id=442, 332.24126pt x 123.46124pt>
+File: images/volumes.png Graphic file (type png)
+<use images/volumes.png>
+Package pdftex.def Info: images/volumes.png  used on input line 244.
+(pdftex.def)             Requested size: 177.42868pt x 65.93335pt.
+<images/depends-on.png, id=443, 896.34875pt x 682.55pt>
+File: images/depends-on.png Graphic file (type png)
+<use images/depends-on.png>
+Package pdftex.def Info: images/depends-on.png  used on input line 277.
+(pdftex.def)             Requested size: 177.42868pt x 135.10158pt.
+ [9 <./images/volumes.png> <./images/depends-on.png>] [10] [11] [12] [13] [14] [15] [16] [17] [18] [19] [20] (./documentacion.aux
 LaTeX Info: Redefining \. on input line 11.
 LaTeX Info: Redefining \% on input line 11.
 )
@@ -629,21 +658,21 @@ LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-22>
  ***********
 Package rerunfilecheck Info: File `documentacion.out' has not changed.
-(rerunfilecheck)             Checksum: 1C2737AA3B3B146D022588022B1D31F9;16182.
+(rerunfilecheck)             Checksum: D14368C590E048E9307FE219EB9885E5;12884.
  ) 
 Here is how much of TeX's memory you used:
- 24038 strings out of 476120
- 442630 string characters out of 5793656
+ 24110 strings out of 476120
+ 444619 string characters out of 5793656
  1939975 words of memory out of 5000000
- 45594 multiletter control sequences out of 15000+600000
+ 45673 multiletter control sequences out of 15000+600000
  565424 words of font info for 47 fonts, out of 8000000 for 9000
  40 hyphenation exceptions out of 8191
  90i,9n,93p,510b,784s stack positions out of 10000i,1000n,20000p,200000b,200000s
  </home/santi/.texlive2023/texmf-var/fonts/pk/ljfour/jknappen/ec/ectt1000.600pk> </home/santi/.texlive2023/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1200.600pk> </home/santi/.texlive2023/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1000.600pk> </home/santi/.texlive2023/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1000.600pk> </home/santi/.texlive2023/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1200.600pk> </home/santi/.texlive2023/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1728.600pk> </home/santi/.texlive2023/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx2488.600pk> </home/santi/.texlive2023/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1440.600pk>
-Output written on documentacion.pdf (22 pages, 132059 bytes).
+Output written on documentacion.pdf (21 pages, 304254 bytes).
 PDF statistics:
- 950 PDF objects out of 1000 (max. 8388607)
- 590 compressed objects within 6 object streams
- 114 named destinations out of 1000 (max. 500000)
- 741 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 900 PDF objects out of 1000 (max. 8388607)
+ 512 compressed objects within 6 object streams
+ 107 named destinations out of 1000 (max. 500000)
+ 630 words of extra memory for PDF output out of 10000 (max. 10000000)
 

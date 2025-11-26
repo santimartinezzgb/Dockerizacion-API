@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Grupo = require('../models/grupo');
+const Grupo = require('../models/grupo.js');
 
 // Obtener todos los grupos
 router.get('/', async (req, res) => {

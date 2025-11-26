@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1763577767.39804 "/home/santi/Escritorio/API-Docker/Documentación/documentacion.tex" "documentacion.pdf" "documentacion" 1763577767.83383 0
+["pdflatex"] 1764153117.59856 "/home/santi/Escritorio/API-Docker/Documentación/documentacion.tex" "documentacion.pdf" "documentacion" 1764153118.27419 0
   "/etc/texmf/web2c/texmf.cnf" 1761766874.02204 475 c0e671620eb5563b2130f56340a5fde8 ""
   "/home/santi/.texlive2023/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1000.600pk" 1763329087.19224 25396 38ec62082c0507c14f4e0ba2eda073a3 ""
   "/home/santi/.texlive2023/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1200.600pk" 1763329086.61724 31928 b76081be42ab267689bbf3e7890985aa ""
@@ -9,7 +9,7 @@
   "/home/santi/.texlive2023/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1200.600pk" 1763329087.47324 28416 29ef16bbf2614481eeda8724677f271b ""
   "/home/santi/.texlive2023/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1728.600pk" 1763329087.76824 42496 cf39f2e7b1f1a2be3bba35b5306ddc4a ""
   "/home/santi/.texlive2023/texmf-var/fonts/pk/ljfour/jknappen/ec/ectt1000.600pk" 1763329086.31724 20008 d1382ff1c36e08a46a4c15e86b08be35 ""
-  "/home/santi/Escritorio/API-Docker/Documentación/documentacion.tex" 1763577767.23863 12877 bc52706101de97a85419db73977817e4 ""
+  "/home/santi/Escritorio/API-Docker/Documentación/documentacion.tex" 1764153117.35698 17490 6211d2a6c13734b0a3b6d737e5840995 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecbx1000.tfm" 1136768653 3584 2d666ecf6d466d8b007246bc2f94d9da ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecbx1200.tfm" 1136768653 3584 402da0b29eafbad07963b1224b222f18 ""
@@ -151,10 +151,15 @@
   "/usr/share/texmf/web2c/texmf.cnf" 1707919699 40399 f2c302f7d2af602abb742093540a5834 ""
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1761766878.35125 128028 f533b797fba58d231669ea19e894e23e ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1763330460 6822806 2e7ad94891dc194d37643af971df125d ""
-  "documentacion.aux" 1763577767.77879 12316 d13025ed46e580013e5a8a8ff791cb4f "pdflatex"
-  "documentacion.out" 1763577767.77962 16182 1c2737aa3b3b146d022588022b1d31f9 "pdflatex"
-  "documentacion.tex" 1763577767.23863 12877 bc52706101de97a85419db73977817e4 ""
-  "documentacion.toc" 1763577767.78027 8120 4dfe30990ab5f2c4eab138db60a63da6 "pdflatex"
+  "documentacion.aux" 1764153118.21395 10604 5fb9272c4d20ef9a61e44445f60cd24e "pdflatex"
+  "documentacion.out" 1764153118.21595 12884 d14368c590e048e9307fe219eb9885e5 "pdflatex"
+  "documentacion.tex" 1764153117.35698 17490 6211d2a6c13734b0a3b6d737e5840995 ""
+  "documentacion.toc" 1764153118.2163 6559 35356a9b9999deaa5bf252d2d63bc042 "pdflatex"
+  "images/API.png" 1763726989.86124 19422 01d56d986241ea012c35566fa2d2659e ""
+  "images/Dockerfile.png" 1763578957.98168 38683 988d1e9d61cc310effb42883338e8a5f ""
+  "images/depends-on.png" 1763581865.34731 68192 f8cfad165175dab687a45c720c90d094 ""
+  "images/docker-compose.png" 1763579397.00599 90966 ebdcd36efab8ecc019e4a4a843bf41cd ""
+  "images/volumes.png" 1763580358.2338 9138 65ff1deb686ce54d4554521031957cab ""
   (generated)
   "documentacion.aux"
   "documentacion.log"
