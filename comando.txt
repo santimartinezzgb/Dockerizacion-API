@@ -1,0 +1,8 @@
+docker run -d \
+  --name mi_contenedor \
+  -e MONGO_URI="mongodb://root:1234@mongo:27017/mi_basedatos?authSource=admin" \
+  -e MONGO_INITDB_ROOT_USERNAME="root" \
+  -e MONGO_INITDB_ROOT_PASSWORD="1234" \
+  -e PORT="3000" \
+  -p 3000:3000 \
+  mi_imagen

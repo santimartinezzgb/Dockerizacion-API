@@ -1,26 +1,20 @@
-# ndica la imagen base para construir un contenedor.
-# En este Dockerfile se utiliza la version 20, la cual incluye ya Node y npm instalados.
+# Dockerfile
 FROM node:20
 
-# Establece el directorio de trabajo dentro del contenedor en /app.
-# Todos los comandos que vienen a continuación se ejecutarán dentro de esta carpeta.
+# Crear directorio de la app
 WORKDIR /app
 
-# Copia los archivos package.json y package-lock.json desde el directorio del host al directorio del contenedor.
-# Así se instalarán las dependencias necesarias en el contenedor.
+# Copiar package.json y package-lock.json
 COPY package*.json ./
 
-# Ejecuta npm install dentro del contenedor para instalar las dependencias del proyecto,
-# las cuales se pueden instalar gracias al paso anterior.
+# Instalar dependencias
 RUN npm install
 
-# Copia todo el código del proyecto al directorio del contenedor
+# Copiar el resto del código
 COPY . .
 
-# Sugiere que el contenedor escuche el puerto 3000
+# Exponer puerto
 EXPOSE 3000
 
-# Comando que se va a ejecutar cuando se inicia el contenedor, iniciando así la aplicación
-CMD ["npm", "start"]
-
-
+# Comando para iniciar la app
+CMD ["node", "app.js"]
