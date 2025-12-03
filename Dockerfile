@@ -1,20 +1,7 @@
-# Dockerfile
-FROM node:20
-
-# Crear directorio de la app
+FROM node:20-alpine
 WORKDIR /app
-
-# Copiar package.json y package-lock.json
 COPY package*.json ./
-
-# Instalar dependencias
-RUN npm install
-
-# Copiar el resto del código
+RUN npm install --production
 COPY . .
-
-# Exponer puerto
 EXPOSE 3000
-
-# Comando para iniciar la app
 CMD ["node", "app.js"]

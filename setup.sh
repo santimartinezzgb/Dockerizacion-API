@@ -1,57 +1,59 @@
 #!/bin/bash
+set -e
 
-# Nombres de contenedores
-MONGO_CONTAINER="mongo"
-API_CONTAINER="mi_api"
-IMAGE_NAME="mi_api:v1.0.0"
+# Cargar .env si existe
+[ -f .env ] && export $(grep -v '^#' .env | xargs)
 
-# Variables de entorno de Mongo
-MONGO_USER="root"
-MONGO_PASSWORD="1234"
-MONGO_DB="mi_basedatos"
-API_PORT=3000
-MONGO_PORT=27018
+# Variables
+VERSION=$(grep -Po '(?<="version": ")[^"]*' package.json)
+IMAGE="${DOCKER_USERNAME:-local}/api-docker:v${VERSION}"
 
-echo "Deteniendo y eliminando contenedores antiguos..."
-docker stop $MONGO_CONTAINER $API_CONTAINER 2>/dev/null
-docker rm $MONGO_CONTAINER $API_CONTAINER 2>/dev/null
+echo "🚀 Iniciando setup..."
 
-echo "Construyendo imagen de la API..."
-docker build -t $IMAGE_NAME .
+# Construir imagen
+echo "🔨 Construyendo imagen: $IMAGE"
+docker build -t $IMAGE .
+docker tag $IMAGE ${DOCKER_USERNAME:-local}/api-docker:latest
 
-echo "🗄️  Levantando MongoDB..."
-docker run -d \
-  --name $MONGO_CONTAINER \
-  -e MONGO_INITDB_ROOT_USERNAME=$MONGO_USER \
-  -e MONGO_INITDB_ROOT_PASSWORD=$MONGO_PASSWORD \
-  -p $MONGO_PORT:27017 \
-  mongo:6
+# Levantar con docker-compose
+echo "🐳 Levantando servicios..."
+docker-compose down 2>/dev/null || true
+docker-compose up -d
 
-# Esperar unos segundos para que Mongo arranque
-echo "Esperando a que Mongo se inicialice..."
-sleep 5
+# Esperar a que Mongo esté listo
+echo "⏳ Esperando MongoDB..."
+until docker exec mongo mongosh --eval "db.adminCommand('ping')" --quiet > /dev/null 2>&1; do
+    printf '.'
+    sleep 2
+done
+echo " ✅"
 
-echo "Levantando la API conectada a Mongo..."
-docker run -d \
-  --name $API_CONTAINER \
-  --link $MONGO_CONTAINER:mongo \
-  -e MONGO_URI="mongodb://$MONGO_USER:$MONGO_PASSWORD@mongo:27017/$MONGO_DB?authSource=admin" \
-  -e PORT=$API_PORT \
-  -p $API_PORT:3000 \
-  $IMAGE_NAME
-
-# Esperar unos segundos para que la API arranque
-echo "Esperando a que la API se inicialice..."
+# Esperar a que la API esté lista
+echo "⏳ Esperando API..."
 sleep 3
+for i in {1..10}; do
+    if curl -s http://localhost:3000/ > /dev/null 2>&1; then
+        echo " ✅"
+        break
+    fi
+    printf '.'
+    sleep 1
+done
 
-echo "Contenedores levantados. Probando la API con curl..."
+# Probar API
+echo "✅ Probando API..."
+curl -s http://localhost:3000/
+echo -e "\n"
+curl -s -X POST http://localhost:3000/grupos -H "Content-Type: application/json" -d '{"nombre":"Test","descripcion":"Prueba"}'
+echo -e "\n"
 
-echo "Ruta raíz:"
-curl http://localhost:$API_PORT/
-echo -e "\nCrear un grupo de prueba:"
-curl -X POST http://localhost:$API_PORT/grupos \
-  -H "Content-Type: application/json" \
-  -d '{"nombre":"Test","descripcion":"Grupo de prueba"}'
-echo -e "\nListar grupos:"
-curl http://localhost:$API_PORT/grupos
-echo -e "\nTodo listo. La API está funcionando en http://localhost:$API_PORT"
+# Subir a Docker Hub si hay credenciales
+if [ -n "$DOCKER_USERNAME" ] && [ -n "$DOCKER_PASSWORD" ]; then
+    echo "🐳 Subiendo a Docker Hub..."
+    echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    docker push $IMAGE
+    docker push ${DOCKER_USERNAME}/api-docker:latest
+    echo "✅ Imagen en Docker Hub: $IMAGE"
+fi
+
+echo -e "\n✅ Todo listo! API en http://localhost:3000"
