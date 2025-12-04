@@ -18,10 +18,32 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       
       - name: Build & Push
+        id: build
         run: |
           VERSION=$(grep -Po '(?<="version": ")[^"]*' package.json)
           IMAGE=${{ secrets.DOCKER_USERNAME }}/api-docker
           docker build -t $IMAGE:v$VERSION -t $IMAGE:latest .
           docker push $IMAGE:v$VERSION
           docker push $IMAGE:latest
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "image=$IMAGE" >> $GITHUB_OUTPUT
           echo "✅ Imagen: $IMAGE:v$VERSION"
+      
+      - name: Enviar notificación a Telegram
+        if: success()
+        run: |
+          VERSION="${{ steps.build.outputs.version }}"
+          IMAGE="${{ steps.build.outputs.image }}"
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          
+          MESSAGE="🚀 *Nueva imagen Docker desplegada*%0A%0A"
+          MESSAGE="${MESSAGE}📦 *Imagen:* \`${IMAGE}\`%0A"
+          MESSAGE="${MESSAGE}🏷️ *Versión:* \`v${VERSION}\`%0A"
+          MESSAGE="${MESSAGE}📝 *Commit:* ${COMMIT_MSG}%0A"
+          MESSAGE="${MESSAGE}🔗 *Docker Hub:* https://hub.docker.com/r/${IMAGE}%0A"
+          MESSAGE="${MESSAGE}👤 *Autor:* ${{ github.actor }}"
+          
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -d chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
+            -d text="${MESSAGE}" \
+            -d parse_mode="Markdown"
