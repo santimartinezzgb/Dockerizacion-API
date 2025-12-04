@@ -12,4 +12,9 @@ Secrets necesarios:
 - `DOCKER_USERNAME`
 - `DOCKER_PASSWORD`
 
+## Configuración Telegram Bot
+Secrets necesarios:
+- `TELEGRAM_CHAT_ID`
+- `TELEGRAM_BOT_TOKEN`
+
 API disponible en: http://localhost:3000
