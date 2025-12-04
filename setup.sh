@@ -12,10 +12,10 @@ echo "Construyendo imagen: $IMAGE"
 docker build -t $IMAGE .
 docker tag $IMAGE ${DOCKER_USERNAME:-local}/api-docker:latest
 
-# Levantar con docker-compose
+# Levantar con docker compose
 echo "Levantando servicios..."
-docker-compose down 2>/dev/null || true
-docker-compose up -d
+docker compose down 2>/dev/null || true
+docker compose up -d
 
 # Esperar a que Mongo esté listo
 echo "Esperando MongoDB..."
