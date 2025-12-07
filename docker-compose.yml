@@ -9,6 +9,7 @@ services:
     ports:
       - "${PORT_MONGO}:27017"
     healthcheck:
+      # Verificar que MongoDB esté listo, mediante un comando de ping
       test: mongosh --eval 'db.adminCommand("ping")' --quiet
       interval: 5s
       timeout: 3s
