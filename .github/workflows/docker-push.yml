@@ -29,6 +29,21 @@ jobs:
           echo "image=$IMAGE" >> $GITHUB_OUTPUT
           echo "✅ Imagen: $IMAGE:v$VERSION"
       
+      - name: Crear y pushear tag de Git
+        run: |
+          VERSION=$(grep -Po '(?<="version": ")[^"]*' package.json)
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Verificar si el tag ya existe
+          if git rev-parse "v$VERSION" >/dev/null 2>&1; then
+            echo "⚠️ Tag v$VERSION ya existe, omitiendo creación"
+          else
+            git tag -a "v$VERSION" -m "Release version $VERSION"
+            git push origin "v$VERSION"
+            echo "✅ Tag v$VERSION creado y pusheado"
+          fi
+      
       - name: Enviar notificación a Telegram
         if: success()
         run: |
