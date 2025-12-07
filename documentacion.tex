@@ -1,0 +1,1013 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage[margin=3cm]{geometry}
+\usepackage{subcaption}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-tabla]{babel}
+
+\usepackage{href-ul}
+\usepackage{tcolorbox}
+\usepackage{listings}
+\usepackage{tocloft}
+\usepackage[table]{xcolor}
+\usepackage{booktabs}
+
+\renewcommand{\contentsname}{Índice}
+\renewcommand{\cfttoctitlefont}{\Huge\bfseries}
+\renewcommand{\cftdotsep}{1}
+
+
+
+\begin{document}
+
+    % ================================= PORTADA E ÍNDICE
+    \begin{titlepage}
+        \centering
+
+        {\Large \textbf{Programación Multimedia y Dispositivos Móviles}\par}
+        
+        \vspace{2cm}
+        {\Huge \textbf{Documentación API dockerizada}\par}
+        \vspace{0.5cm}
+        {\LARGE Servidor Backend con Express y MongoDB\par}
+        
+        \vspace{2cm}
+        \noindent\rule{10cm}{0.4pt}
+        
+        \vspace{2cm}
+        {\Large \textbf{Autor:}\par}
+        \vspace{0.3cm}
+        {\large Santi Martínez\par}
+        
+        \vspace{10cm}
+        {\large \today}
+        
+    \end{titlepage}
+
+    \newpage
+    \tableofcontents
+
+    % ================================= INTRODUCCIÓN
+    \newpage
+    \section{Introducción}
+
+        \subsection{Contexto del proyecto}
+
+            Este proyecto aborda la dockerización de una API REST desarrollada con Node.js y Express, que utiliza MongoDB como sistema de gestión de base de datos. La API implementa funcionalidades de gestión de usuarios y grupos.
+
+            La aplicación se compone de dos servicios principales que deben funcionar de manera coordinada: el servidor de aplicación que expone los endpoints REST y la base de datos MongoDB que persiste la información.
+            
+            La dockerización de estos componentes permite encapsular cada servicio en contenedores independientes, facilitando su gestión, despliegue y mantenimiento.
+
+        \subsection{Objetivos de la dockerización}
+
+            Los principales objetivos para realizar la dockerización de la API son los siguientes:
+
+            \begin{itemize}
+                \item \textbf{Consistencia:} Permite la ejecución del entorno en cualquier ordenador preparado para ejecutar Docker; es decir, funciona de manera autónoma, llevando todo lo necesario en su interior y operando desde ahí, de forma similar a un caballo de Troya.
+
+                \item \textbf{Aislamiento de componentes:} Cada servicio (API y MongoDB) se ejecuta en su propio contenedor con su propio sistema de archivos, procesos y red, evitando conflictos de dependencias.
+
+                \item \textbf{Portabilidad:} Permitir que la aplicación se ejecute de manera consistente en cualquier sistema operativo (Windows, macOS, Linux).
+
+                \item \textbf{Simplificación del despliegue:} Reducir el proceso de instalación y configuración.
+
+                \item \textbf{Escalabilidad:} Permite crear varias copias de un servicio para que se pueda ejecutar en varios lugares al mismo tiempo.
+                
+                \item \textbf{Gestión de dependencias:} Encapsular todas las dependencias que usa la API (mongoose, express, dotenv, etc ...) de la aplicación dentro de la imagen Docker, garantizando que siempre se mantengan correctas.
+            \end{itemize}
+
+
+        \subsection{Tecnologías utilizadas}
+
+            El conjunto de tecnologías utilizado es el siguiente:
+
+            \begin{itemize}
+                \item \textbf{Node.js 20:} Entorno de ejecución de JavaScript del lado del servidor.
+
+                \item \textbf{Express.js:} Framework de Node para la realización de servidores.
+
+                \item \textbf{MongoDB 6:} Base de datos NoSQL orientada a documentos.
+
+                \item \textbf{Mongoose:} ODM (Object Document Mapper) que permite que Node.js se comunique y gestione datos en MongoDB.
+
+                \item \textbf{Docker:} Plataforma de contenedorización que permite empaquetar aplicaciones con todas sus dependencias en contenedores estandarizados. Proporciona un aislamiento ligero y eficiente.
+
+                \item \textbf{Docker Compose:} Herramienta de docker para orquestar varios contenedores a la vez. Permite configurar todos los servicios, redes y volúmenes de la aplicación en un único archivo YML (docker-compose.yml).
+
+                \item \textbf{Variables de entorno:} Variables de configuración del programa, guardadas de forma privada en un .env.
+            \end{itemize}
+
+
+            La combinación de estas tecnologías crea un ecosistema robusto, escalable y fácil de mantener.
+
+
+    % ================================= FUNDAMENTOS TEÓRICOS
+    \newpage
+    \section{Fundamentos teóricos utilizados}
+
+        \subsection{¿Qué es Docker?}
+            Es una plataforma que ejecuta aplicaciones en contenedores, asegurando que su funcionamiento sea el correcto en cualquier sistema.
+
+            \begin{figure}[h!]
+                \centering
+                \includegraphics[width=0.3\textwidth]{images/docker-logo.jpg}
+            \end{figure}
+
+            \vspace{0.3cm}
+            \textbf{Docker corre principalmente sobre Linux}, porque utiliza características del kernel de Linux para los contenedores.
+            \begin{itemize}
+                \item En \textbf{Linux}, se ejecuta de \underline{forma nativa}.
+                \item En \textbf{Windows} o \textbf{Mac}, usa una \underline{máquina virtual ligera con Linux} para poder correr contenedores.
+            \end{itemize}
+
+            \subsubsection{Contenedores vs Máquinas Virtuales}
+
+                \begin{table}[h!]
+                    \centering
+                    \rowcolors{2}{white}{blue!15}
+                    \begin{tabular}{@{} l l l @{}}
+                        \toprule
+                        \textbf{Características} & \textbf{Contenedor} & \textbf{Máquina Virtual (VM)} \\
+                        \midrule
+                        Sistema operativo & Comparte el SO del host & Cada VM tiene su propio SO completo \\
+                        Peso & Ligero, rápido de iniciar & Pesado, tarda más en iniciar \\
+                        Recursos & Usa solo lo necesario & Consume más recursos, reserva CPU/RAM \\
+                        Aislamiento & Aislado a nivel de procesos & Aislado a nivel de hardware virtual \\
+                        Portabilidad & Muy portable & Menos portable \\
+                        \bottomrule
+                    \end{tabular}
+                    \caption{Comparación entre contenedores y máquinas virtuales}
+                \end{table}
+
+            \subsubsection{Docker Compose}
+
+                Docker Compose es una herramienta que permite orquestar varios contenedores mediante un archivo de configuración (\textbf{docker-compose.yml}). Facilita levantar, detener y administrar varios contenedores juntos, incluyendo servicios, redes y volúmenes.
+
+            \subsubsection{Dockerfile}
+
+                Un Dockerfile es un archivo de texto que contiene instrucciones para construir una imagen de Docker. Define la base del sistema, dependencias, configuraciones y comandos necesarios para que la aplicación se ejecute de forma consistente en cualquier contenedor.
+
+                En este proyecto, se utiliza un Dockerfile para definir cómo construir la imagen de la API.
+
+            \subsubsection{.dockerignore}
+
+                Archivo muy similar al .gitignore, en el que se introduce todo el contenido que no debe ser subido por seguridad u optimización.
+
+                La diferencia con .gitignore es que este último es para Git, y el .dockerignore es para Docker; por lo que influye en la construcción de la imagen Docker.
+
+            \subsubsection{Conceptos clave}
+            
+                Para una mayor comprensión de la utilización de Docker, hay que analizar también unos conceptos principales; estos son de vital importancia:
+
+                \begin{itemize}
+                    \item \textbf{Imágenes}: Plantilla que contiene todo lo necesario para ejecutar una aplicación perfectamente (Mongo, Ubuntu, Odoo, ...)
+                    \item \textbf{Contenedores}: Instancia de una imagen, la cual se encuentra aislada.
+                    \item \textbf{Volúmenes}: Almacenamiento persistente que conserva datos fuera del contenedor. Básicamente, en el caso de eliminar el contenedor por lo que sea, los datos guardados en el volumen siguen existiendo en el host. Se utiliza para datos importantes.
+                    \item \textbf{Redes}: Medio que permite la comunicación entre contenedores y el exterior. Por ejemplo a la hora de realizar manualmente ejecutarse a un contenedor, la parte del comando \texttt{-p 3000:3000}, el primer puerto es del host y el segundo del contenedor, eso hace que ambos se comuniquen.
+                \end{itemize}
+
+                \vspace{0.3cm}
+                \begin{figure}[h!]
+                    \centering
+                    \includegraphics[width=0.9\textwidth]{images/docker-componentss.png}
+                \end{figure}
+
+
+        \newpage
+        \subsection{¿Qué es MongoDB?}
+
+            MongoDB es una base de datos NoSQL orientada a documentos que almacena datos en formato BSON (Binary JSON).
+
+            \vspace{0.3cm}
+            Para una buena interacción de datos API-MongoDB, se utiliza Mongoose, un ODM (Object Document Mapper) que permite que Node.js se comunique y gestione datos en MongoDB de manera sencilla y eficiente.
+
+            \begin{figure}[h!]
+                \centering
+                \includegraphics[width=0.6\textwidth]{images/mongo-db.png}
+            \end{figure}
+
+            Algunas características clave de MongoDB incluyen:
+
+            \begin{itemize}
+                \item \textbf{Alto rendimiento}: Optimizada para operaciones rápidas de lectura y escritura.
+                \item \textbf{Seguridad}: Soporta autenticación, autorización y cifrado de datos.
+                \item \textbf{Modelo de datos flexible}: Permite almacenar documentos con estructuras variadas.
+                \item \textbf{Escalabilidad horizontal}: Facilita la distribución de datos a través de múltiples servidores.
+                \item \textbf{Consultas avanzadas}: Soporta consultas complejas y agregaciones.
+                \item \textbf{Alta disponibilidad}: Ofrece replicación y recuperación ante fallos.
+            \end{itemize}
+
+            \subsubsection{SQL vs NoSQL}
+
+                \begin{table}[h!]
+                    \centering
+                    \rowcolors{2}{white}{blue!15}
+                    \begin{tabular}{@{} l l l @{}}
+                        \toprule
+                        \textbf{Características} & \textbf{SQL (Relacional)} & \textbf{NoSQL (No Relacional)} \\
+                        \midrule
+                        Estructura de datos & Tablas con filas y columnas & Documentos, clave-valor, grafos, etc. \\
+                        Esquema & Esquema fijo y predefinido & Esquema flexible y dinámico \\
+                        Escalabilidad & Escalabilidad vertical & Escalabilidad horizontal \\
+                        Lenguaje de consulta & SQL (Structured Query Language) & Varios lenguajes específicos \\
+                        Transacciones & Soporta transacciones ACID & Soporte limitado para transacciones ACID \\
+                        Ejemplos populares & MySQL, PostgreSQL, Oracle DB & MongoDB, Cassandra, Redis \\
+                        \bottomrule
+                    \end{tabular}
+                \end{table}
+
+
+        \newpage
+        \subsection{¿Qué es un .sh?}
+
+
+            \begin{minipage}{.5\textwidth}
+                Este apartado está dedicado al encargado de poner en marcha el despliegue. \textbf{.sh}.
+                
+                \vspace{0.3cm}
+                Se ha utilizado para la simplificación del proceso de dockerización, ya que contiene todos los comandos necesarios para construir y ejecutar los contenedores de forma automática. Eso libra al usuario de tener que escribir varios comandos manualmente, evitando errores y facilitando el proceso.
+            \end{minipage}
+            \hspace{1cm}
+            \begin{minipage}{.4\textwidth}
+                \includegraphics[scale=0.3]{images/sh.jpg}
+            \end{minipage}
+
+            \begin{tcolorbox}
+                Un archivo .sh es un script de shell utilizado en sistemas operativos basados en Unix/Linux para automatizar tareas mediante comandos del shell. Estos archivos contienen una serie de instrucciones que se ejecutan secuencialmente cuando se ejecuta el script; de manera similar que el archivo Dockerfile, explicado anteriormente.
+            \end{tcolorbox}
+
+            \vspace{0.3cm}
+            Para la ejecución de un archivo .sh, es necesario otorgarle permisos de ejecución utilizando el comando
+            
+            \begin{center}
+                \texttt{chmod +x nombre\_archivo.sh}
+            \end{center}
+
+            y luego, dentro del repositorio, se puede ejecutar con
+            
+            \begin{center}
+                \texttt{./nombre\_archivo.sh}
+            \end{center}
+
+            \vspace{0.3cm}
+            Esto, en un solo comando, ejecuta todas las instrucciones contenidas en el archivo .sh de forma automática. Entre las que se encuentran:
+            \begin{itemize}
+                \item Construcción de la imagen Docker de la API.
+                \item Levantamiento de los contenedores utilizando Docker Compose.
+                \item Verificación del estado de los contenedores.
+            \end{itemize}
+
+            Particularmente, se ha utilizado para facilitar el proceso de dockerización del proyecto, haciendo que sea accesible incluso para aquellos con poca experiencia en Docker; evitando así errores comunes y asegurando que todos los pasos necesarios se realicen correctamente.
+
+
+    % ================================= ARQUITECTURA
+    \newpage
+    \section{Arquitectura}
+
+        La arquitectura del proyecto se compone de dos servicios principales: la API REST y la base de datos MongoDB. Estos servicios se ejecutan en contenedores separados, pero se comunican entre sí para proporcionar la funcionalidad completa de la aplicación.
+
+        \vspace{0.3cm}
+        El encargado de orquestar estos contenedores es Docker Compose.
+
+        \vspace{0.3cm}
+        Para ello, se utiliza un archivo \textbf{docker-compose.yml} que define los servicios, redes y volúmenes necesarios para la aplicación.
+
+        \vspace{0.3cm}
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[width=1\textwidth]{images/arquitect.png}
+            \caption{Arquitectura del un sistema dockerizado}
+        \end{figure}
+        
+
+        \subsection{Descripción de la API}
+        
+            Es una API REST desarrollada con Node.js y Express, que utiliza MongoDB como sistema de gestión de base de datos. La API implementa funcionalidades de gestión de usuarios y grupos.
+
+            \vspace{0.3cm}
+            La aplicación se compone de dos servicios principales que deben funcionar de manera coordinada:
+            \begin{itemize}
+                \item \textbf{Servidor de aplicación:} Expone los endpoints REST y maneja la lógica de negocio.
+                \item \textbf{Base de datos MongoDB:} Persiste la información de usuarios y grupos.
+            \end{itemize}
+
+
+            
+        \subsection{Componentes del sistema}
+
+            \begin{itemize}
+                \item \textbf{API REST:} Servidor backend desarrollado con Node.js y Express, que maneja las solicitudes HTTP y la lógica de negocio.
+                \item \textbf{MongoDB:} Base de datos NoSQL que almacena los datos de usuarios y grupos.
+                \item \textbf{Docker:} Plataforma de contenedorización que encapsula la API y MongoDB en contenedores independientes.
+                \item \textbf{Docker Compose:} Herramienta para orquestar los contenedores de la API y MongoDB, definiendo servicios, redes y volúmenes en un archivo YML.
+            \end{itemize}            
+
+
+
+    % ================================= DOCKERFILE: CONSTRUCCIÓN DE LA IMAGEN
+    \newpage
+    \section{Construcción de la imagen}
+
+        Es un archivo de texto que contiene instrucciones para construir una imagen de Docker. Define la base del sistema, dependencias, configuraciones y comandos necesarios para que la aplicación se ejecute de forma consistente en cualquier contenedor.
+
+        \vspace{0.3cm}
+        La forma de ejecutar los comandos de su interior es de forma \textbf{secuencial}
+
+        \subsection{Dockerfile}
+            \begin{figure}[h!]
+                \centering
+                \includegraphics[width=0.5\textwidth]{images/Dockerfile.png}
+                \caption{Dockerfile}
+            \end{figure}
+
+            \paragraph{\textsf{FROM node:20}}.
+                Indica la imagen base para construir un contenedor. En este Dockerfile se utiliza la version 20, la cual incluye ya Node y npm instalados.
+                
+                \vspace{0.3cm}
+                Uso de \textbf{node:20} en lugar de por ejemplo \textbf{node:20-alpine}, para evitar problemas de compatibilidad con algunas dependencias nativas de Node.js que pueden no estar disponibles en la versión Alpine, que pese a ser más ligera, puede causar problemas.
+
+
+            \paragraph{\textsf{WORKDIR /app}}.
+                Establece el directorio de trabajo dentro del contenedor en /app. Todas las instrucciones posteriores se ejecutarán desde este directorio.
+            \paragraph{\textsf{COPY package*.json ./}}.
+                Copia los archivos package.json y package-lock.json desde el directorio del host al directorio del contenedor. Así se instalarán las dependencias necesarias en el contenedor.
+
+                \vspace{0.3cm}
+                El \textbf{*} en package*.json es un comodín que permite copiar ambos archivos en una sola instrucción.
+
+            \paragraph{\textsf{RUN npm install --production}}.
+                Ejecuta npm install dentro del contenedor para instalar las dependencias del proyecto, las cuales se pueden instalar gracias al paso anterior.
+
+                \vspace{0.3cm}
+                La opción \textbf{--production} asegura que solo se instalen las dependencias necesarias para ejecutar la aplicación en producción, excluyendo las dependencias de desarrollo.
+
+            \paragraph{\textsf{COPY . .}}.
+                Copia todo el código del proyecto al directorio del contenedor
+            \paragraph{\textsf{EXPOSE 3000}}.
+                Sugiere que el contenedor escuche el puerto 3000
+            \paragraph{\textsf{CMD ["npm","start"]}}.
+                Comando que se va a ejecutar cuando se inicia el contenedor, iniciando así la aplicación.
+
+    
+    % ================================= DOCKER COMPSE: ORQUESTACIÓN DE SERVICIOS
+    \newpage
+    \section{Docker Compose: Orquestación de servicios}
+
+        Es una herramienta que permite definir y ejecutar aplicaciones que usan múltiples contenedores mediante un archivo de configuración (docker-compose.yml). Describe servicios, redes y volúmenes, facilitando desplegar y administrar toda la aplicación de manera consistente.
+
+        \subsection{Estructura del archivo docker-compose.yml}
+            
+            La arquitectura definida en el docker-compose.yml consta de dos servicios principales: la API y MongoDB, cada uno en su propio contenedor
+
+            \begin{figure}[h!]
+                \centering
+                \includegraphics[width=0.6\textwidth]{images/contenedro.png}
+                \caption{docker-compose.yml}
+            \end{figure}
+
+        \subsection{Servicios}
+
+            \begin{itemize}
+                \item \textbf{build}. Define la ruta o Dockerfile para construir una imagen personalizada del servicio antes de ejecutarlo.
+                
+                \vspace{0.3cm}
+                En este proyecto se utiliza para: \texttt{docker build -t mi\_api:v1.0.0 .}
+                
+                \item \textbf{image}. Especifica la imagen de Docker que se va a usar para el servicio; puede ser desde Docker Hub o de forma local.
+                
+                \vspace{0.3cm}
+                En este proyecto se hará de forma local.
+                
+                \item \textbf{container\_name}. Le da un nombre al contenedor, sino lo hace automáticamente.
+                
+                \item \textbf{ports}. Mapea puertos del contenedor a puertos del host, permitiendo que los servicios sean accesibles desde el exterior.
+                
+                \item \textbf{environment}. Define variables de entorno que se pasarán al contenedor para configurarlo.
+                
+                \item \textbf{depends\_on}. Indica que el servicio en el que se sitúa depende de otros, lo que asegura que estos otros se inicien antes.
+                
+                \item \textbf{volumes}. Permite montar directorios/archivos del host dentro del contenedor, así se persisten los datos y se comparte información entre ambos.
+            \end{itemize}
+
+
+        \subsection{Variables de entorno}
+
+            Variables de configuración del programa, guardadas de forma privada en un .env.
+
+            \vspace{0.3cm}
+            En el repositorio se puede encontrar también una plantilla del mismo llamada \textbf{.env.example}, la cual contiene las variables necesarias para el correcto funcionamiento de la API.  Solo es necesario copiarla y renombrarla a .env, y rellenar los valores de las variables según las necesidades del usuario.
+
+            Posteriormente el .env en el que se encuentran estas variables será guardado en .gitignore y en .dockerignore.
+
+            \begin{tcolorbox}
+                \textbf{.dockerignore} y \textbf{.gitignore} son archivos en los que se introduce todo el contenido que no debe ser subido por seguridad u optimización.
+                
+                \vspace{0.3cm}
+                .dockerignore influye en la construcción de la imagen Docker, mientras que .gitignore es para Git.
+            \end{tcolorbox}
+
+            En este proyecto, las variables de entorno definidas en el archivo .env son:
+            \begin{figure}[h!]
+                \centering
+                \includegraphics[width=0.8\textwidth]{images/env.png}
+                \caption{Ejemplo de variables de entorno en .env}
+            \end{figure}
+
+        \subsection{Dependencias entre servicios}
+
+            \begin{minipage}[t]{0.5\textwidth}
+                \vspace{0.3cm}
+                En el \textbf{docker-compose.yml}, el servicio \textbf{api} depende del servicio \textbf{mongo}, lo que significa que Docker Compose inicia primero el contenedor de Mongo antes de levantar la API. Así se asegura que la base de datos esté en ejecución cuando la API intente conectarse y no se quede colgada.
+
+                \vspace{0.5cm}
+                El \textbf{depends\_on} garantiza el orden de inicio de los contenedores. 
+            \end{minipage}
+            \hspace{1cm}
+            \begin{minipage}[t]{0.4\textwidth}
+                \vspace{0pt}
+                \centering
+                \includegraphics[width=1\textwidth]{images/depends-on.png}
+            \end{minipage}
+
+
+
+    % ================================= PROCESO DE DOCKERIZACIÓN
+    \newpage
+    \section{Proceso de dockerización}
+
+        Esta sección detalla los pasos seguidos para dockerizar este proyecto, desde la preparación del entorno hasta la verificación del funcionamiento.
+
+        \vspace{0.3cm}
+        \textbf{Pasos principales:}
+        \begin{enumerate}
+            \item Preparación del entorno
+            \item Construcción de la imagen
+            \item Creación y ejecución de contenedores
+            \item Verificación del funcionamiento
+        \end{enumerate}
+
+        \subsection{Preparación del entorno}
+
+            \begin{itemize}
+                \item \textbf{Instalación de Docker y Docker Compose:} Asegurarse de tener Docker y Docker Compose instalados en el sistema.
+                \item \textbf{Estructura del proyecto:} Organizar el código, Dockerfile, docker-compose.yml y otros archivos necesarios.
+                \item \textbf{Configuración de variables de entorno:} Crear un archivo .env para almacenar configuraciones sensibles como credenciales de la base de datos.
+            \end{itemize}
+
+        \subsection{Construcción de la imagen}
+
+            \begin{itemize}
+                \item \textbf{Escribir el Dockerfile:} Crear un Dockerfile que defina cómo construir la imagen de la API.
+                \item \textbf{Construir la imagen:} Utilizar el comando \texttt{docker build -t mi\_api:v1.0.0 .} para construir la imagen de la API.
+                \item \textbf{Verificar la imagen:} Usar \texttt{docker images} para asegurarse de que la imagen se ha creado correctamente.
+            \end{itemize}
+
+        \subsection{Creación y ejecución de contenedores}
+
+            \begin{itemize}
+                \item \textbf{Definir docker-compose.yml:} Crear un archivo docker-compose.yml que describa los servicios de la API y MongoDB, incluyendo redes y volúmenes.
+                \item \textbf{Levantar los contenedores:} Ejecutar \texttt{docker compose up -d} para iniciar los contenedores en segundo plano.
+                \item \textbf{Verificar contenedores activos:} Usar \texttt{docker ps} para comprobar que ambos contenedores están en ejecución.
+            \end{itemize}
+
+        \subsection{Verificación del funcionamiento}
+
+            \begin{itemize}
+                \item \textbf{Probar endpoints de la API:} Utilizar herramientas como Postman o curl para enviar solicitudes a los endpoints de la API y verificar las respuestas.
+                \item \textbf{Comprobar la conexión a MongoDB:} Asegurarse de que la API puede conectarse a la base de datos y realizar operaciones CRUD.
+                \item \textbf{Revisar logs:} Utilizar \texttt{docker logs <container\_id>} para revisar los logs de ambos contenedores y solucionar posibles problemas.
+            \end{itemize}
+
+        \subsection{Recomendación para verificar información}
+
+            Para comprobar que la imagen se ha construido correctamente, y que los contenedores están funcionando bien, se puede utilizar una herramienta de open source que desglosa toda la información principal de Docker de manera visual y sencilla.
+
+            \vspace{0.3cm}
+            La herramienta se llama \textbf{dockerinfo}, y se puede encontrar en \href{https://github.com/santimartinezzgb/dockerinfo}{dockerinfo - santimartinezzgb}.
+
+            \begin{figure}[h!]
+                \centering
+                \includegraphics[width=1\textwidth]{images/dockerinfo.png}
+            \end{figure}
+
+
+
+
+    % ================================= CHATBOT EN TELEGRAM
+    \newpage
+    \section{Chatbot en Telegram}
+
+        Para facilitar la interacción con la API dockerizada, se ha implementado un chatbot en Telegram que permite a los usuarios realizar operaciones básicas a través de mensajes. Este chatbot se comunica con la API para enviar y recibir datos.
+
+        \vspace{0.3cm}
+        Esta clase de bots son muy útiles para notificaciones rápidas y para interactuar con la API sin necesidad de una interfaz gráfica compleja.
+
+        \vspace{0.3cm}
+        En este proyecto se ha utilizado el bot \textbf{RawDataBot} para crear y gestionar el chatbot en Telegram. El motivo de esta elección es su facilidad de uso y la capacidad de integrarse con APIs externas mediante tokens de acceso, lo cual se consigue de forma sencilla a través de GitHub Actions.
+
+        \newpage
+        \subsection{Crear y configurar el bot}
+            
+            En el buscador de Telegram, se busca "BotFather", el cual es el bot oficial para crear y gestionar otros bots en Telegram.
+
+            \vspace{0.3cm}
+            Al iniciar una conversación con BotFather, se pueden ver varias opciones disponibles para gestionar los bots, como crear uno nuevo, listar los existentes, cambiar configuraciones, entre otras.
+
+            \vspace{0.3cm}
+            \begin{figure}[h!]
+                \centering
+                \includegraphics[width=0.8\textwidth]{images/chatbot/opcions-botfather.png}
+            \end{figure}
+            
+        \newpage
+        \subsection{Ponerle nombre}
+        
+            La creación del bot se realiza mediante el comando /newbot, el cual solicita un nombre de usuario para el mismo, el cual, por lo que se ve en la siguiente imagen, tiene que ser atómico y único, sino BotFather no lo aceptará.
+
+            \vspace{0.3cm}
+            Al enviar un nombre válido, el BotFather responde con un mensaje de confirmación y proporciona el token de acceso necesario para la integración con la API (por razones de seguridad, este token se muestra tapado en la imagen).
+
+            \vspace{0.3cm}
+            \begin{figure}[h!]
+                \centering
+                \includegraphics[width=0.9\textwidth]{images/chatbot/buscar-nombre.png}
+            \end{figure}
+
+        
+        \newpage
+        \subsection{Obtener el ID del bot}
+
+            Para obtener el ID del bot, basta con enviar el mensaje "/start" a RawDataBot en Telegram, el cual responderá con un mensaje que incluye el ID del bot.
+            \begin{figure}[h!]
+                \centering
+                \includegraphics[width=0.7\textwidth]{images/chatbot/id.png}
+            \end{figure}
+
+            \vspace{0.3cm}
+            Con este ID, y el token obtenido anteriormente, se puede configurar la API para que el bot pueda interactuar con ella.
+
+            \vspace{0.3cm}
+            Para ello se entrará en secrets -> actions en GitHub, y se añadirán dos nuevos secretos con los nombres \textbf{TELEGRAM\_BOT\_TOKEN} y \textbf{TELEGRAM\_CHAT\_ID}, con los valores del token y el ID respectivamente.
+
+            \vspace{0.3cm}
+            \begin{figure}[h!]
+                \centering
+                \includegraphics[width=1\textwidth]{images/chatbot/actions.png}
+            \end{figure}
+
+        \newpage
+        \subsection{Chatbot funcionando}
+
+            Una vez configurado el bot y obtenido el ID, se puede interactuar con él enviando comandos específicos que la API reconoce y procesa.
+
+            \vspace{0.3cm}
+            El mensaje de confirmación del bot, se enviará al pushear los cambios a la rama main del repositorio, lo que desencadenará el workflow de GitHub Actions que construye y despliega la API dockerizada.
+
+            \begin{figure}[h!]
+                \centering
+                \includegraphics[width=1\textwidth]{images/chatbot/conseguido.png}
+            \end{figure}
+
+
+    % ================================= ACTUALIZACIÓN DE IMAGEN Y TAG   
+    \newpage
+    \section{Actualización de imagen y tag}
+
+        Tanto la imagen de Docker como su tag en GitHub, se actualizan en el momento que se pushean cambios a la rama main del repositorio. Esto se logra mediante un workflow de GitHub Actions que se activa con cada push a main.
+
+        \subsection{Imagen Docker Hub}
+
+            A medida que se realizan cambios en la API, es importante mantener la imagen de Docker actualizada para reflejar estos cambios. Esto implica reconstruir la imagen y asignarle un nuevo tag que indique la versión actualizada.
+
+            \begin{figure}[h!]
+                \centering
+                \includegraphics[width=1\textwidth]{images/actualización-docker-hub.png}
+            \end{figure}
+
+            Como se puede observar en la imagen anterior, cada vez que se realiza un push a main, se crea una nueva versión de la imagen en Docker Hub con un tag que refleja la versión actualizada (por ejemplo, v1.0.1, v1.0.2, etc.).
+
+        \newpage
+        \subsection{Tag en GitHub}
+
+            Similarmente, el tag en GitHub también se actualiza con cada push a main. Esto permite llevar un control de versiones claro y organizado del código fuente de la API.
+
+            \begin{figure}[h!]
+                \centering
+                \includegraphics[width=1\textwidth]{images/actualización-tag-GitHub.png}
+            \end{figure}
+
+            En la imagen anterior, se puede ver cómo los tags en GitHub reflejan las versiones de la API, facilitando la identificación de cambios y mejoras en cada versión.
+
+        \subsection{Beneficios de la actualización de versiones}
+
+            Mantener la imagen de Docker y los tags en GitHub actualizados ofrece varios beneficios clave:
+
+            \begin{itemize}
+                \item \textbf{Control de versiones:} Permite rastrear cambios y revertir a versiones anteriores si es necesario.
+                \item \textbf{Despliegue consistente:} Asegura que las implementaciones utilicen la versión correcta de la API.
+                \item \textbf{Facilita la colaboración:} Los desarrolladores pueden trabajar con versiones específicas del código y la imagen Docker.
+            \end{itemize}
+        
+
+    % ================================= COMANDOS DOCKER ÚTILES
+    \newpage
+    \section{Comandos Docker útiles}
+
+        Para poder trabajar correctamente con Docker y Docker Compose, es necesario conocer una serie de comandos básicos que son de gran ayuda en la gestión de imágenes y contenedores, así como en la depuración de problemas de los mismos.
+
+        Pese a la explicación de cada uno de los principales comandos para poder seguir la línea de una correcta dockerización, en este esa labor la realiza el archivo \textbf{setup.sh} que se encuentra en la raíz del proyecto, el cual contiene todos los comandos necesarios para construir y ejecutar los contenedores de forma automática.
+
+        \subsection{Comandos básicos}
+
+            Son los comandos esenciales para construir, ejecutar y gestionar contenedores e imágenes de Docker.
+
+            \begin{itemize}
+                \item \textbf{docker build -t <nombre\_imagen>:<tag> .}: Construye una imagen de Docker a partir del Dockerfile en el directorio actual.
+                \item \textbf{docker images}: Lista todas las imágenes de Docker disponibles localmente.
+                \item \textbf{docker run -d -p <host>:<contenedor> --name <contenedor> <imagen>:<version>} Crea y ejecuta un contenedor en segundo plano, mapeando puertos y asignando un nombre.
+                
+                En este caso: \texttt{docker run -d -p 3000:3000 --name api api-docker:v1.0.0}
+                \item \textbf{docker ps}: Muestra los contenedores en ejecución.
+                \item \textbf{docker stop <nombre\_ contenedor>}: Detiene un contenedor en ejecución.
+                \item \textbf{docker rm <nombre\_contenedor>}: Elimina un contenedor detenido.
+                \item \textbf{docker rmi <nombre\_imagen>:<tag>}: Elimina una imagen de Docker. Cabe mencionar que no se puede eliminar una imagen si hay contenedores con esa imagen, tanto en ejecución como detenidos.
+            \end{itemize}
+
+        \subsection{Gestión de imágenes}
+
+            Manejo de imágenes de Docker, incluyendo el pull, etiquetado y subida a repositorios.
+
+            \begin{itemize}
+                \item \textbf{docker pull <nombre\_imagen>:<tag>}: Descarga una imagen de Docker desde un repositorio (como Docker Hub).
+                \item \textbf{docker tag <imagen\_id> <nuevo\_nombre\_imagen>:<nuevo\_tag>}: Etiqueta una imagen existente con un nuevo nombre y tag.
+                \item \textbf{docker push <nombre\_imagen>:<tag>}: Sube una imagen de Docker a un repositorio.
+            \end{itemize}
+
+        \subsection{Gestión de contenedores}
+
+            Gestión avanzada de contenedores en ejecución.
+
+            \begin{itemize}
+                \item \textbf{docker exec -it <nombre\_contenedor> /bin/bash}: Accede a la terminal de un contenedor en ejecución.
+                \item \textbf{docker logs <nombre\_contenedor>}: Muestra los logs de un contenedor.
+                \item \textbf{docker inspect <nombre\_contenedor>}: Proporciona detalles técnicos sobre un contenedor.
+            \end{itemize}
+
+        \subsection{Docker Compose CLI}
+
+            Comandos específicos para gestionar aplicaciones definidas con Docker Compose.
+
+            \begin{itemize}
+                \item \textbf{docker compose up -d}: Inicia los servicios definidos en docker-compose.yml en segundo plano.
+                \item \textbf{docker compose down}: Detiene y elimina los contenedores, redes y volúmenes creados por docker-compose up.
+                \item \textbf{docker compose ps}: Muestra el estado de los servicios definidos en docker-compose.yml.
+                \item \textbf{docker compose logs <servicio>}: Muestra los logs de un servicio específico definido en docker-compose.yml.
+            \end{itemize}
+
+        \subsection{Comandos de depuración}
+
+            Son útiles para monitorear y diagnosticar problemas en contenedores en ejecución.
+
+            \begin{itemize}
+                \item \textbf{docker stats}: Muestra estadísticas en tiempo real del uso de recursos de los contenedores en ejecución.
+                \item \textbf{docker network ls}: Lista todas las redes de Docker.
+                \item \textbf{docker volume ls}: Lista todos los volúmenes de Docker.
+            \end{itemize}
+
+
+
+
+    % ================================= PRUEBAS Y VALIDACIÓN
+    \newpage
+    \section{Pruebas y validación}
+
+        Después de dockerizar la API y MongoDB, es fundamental realizar pruebas para asegurar que ambos servicios funcionan correctamente y se comunican entre sí como se espera.
+
+
+        \subsection{Verificación de contenedores activos}
+
+            Utilizar el comando \texttt{docker ps} para comprobar que ambos contenedores (API y MongoDB) están en ejecución y funcionando correctamente.
+
+            \vspace{0.3cm}
+            El comando utilizado es:
+            \begin{center}
+                \texttt{docker ps}
+            \end{center}
+
+        \subsection{Pruebas de conectividad}
+
+            Asegurarse de que la API puede conectarse a MongoDB utilizando la cadena de conexión definida en las variables de entorno. Esto se puede verificar revisando los logs del contenedor de la API para confirmar que la conexión se ha establecido correctamente.
+
+            \vspace{0.3cm}
+            Las pruebas de conectividad se han realizado revisando los logs del contenedor de la API con el comando:
+            \begin{center}
+                \texttt{docker logs <nombre\_contenedor\_api>}
+            \end{center}
+
+        \subsection{Pruebas de endpoints}
+
+            Utilizar herramientas como Postman o curl para enviar solicitudes a los endpoints de la API y verificar que las respuestas son correctas. Esto incluye probar operaciones CRUD (Crear, Leer, Actualizar, Eliminar) para usuarios y grupos.
+
+            \vspace{0.3cm}
+            En el caso de este proyecto, se ha probado curl con los siguientes comandos:
+            \begin{center}
+                \texttt{curl -X GET http://localhost:mi-puerto/api/users}
+            \end{center}
+
+    % ================================= DESPLIEGUE
+    \newpage
+    \section{Despliegue}
+
+        El despliegue de la aplicación dockerizada implica poner en marcha los contenedores en un entorno de desarrollo, asegurando que estén accesibles y funcionando correctamente.
+
+        \subsection{Comandos de despliegue}
+
+            \begin{itemize}
+                \item \textbf{docker compose up -d}: Levanta los contenedores, y el -d indica que se ejecuten en segundo plano.
+                \item \textbf{docker compose down}: Detiene y elimina los contenedores, redes y volúmenes creados.
+            \end{itemize}
+
+        \subsection{Monitoreo y mantenimiento}
+
+            Implementar herramientas de monitoreo para supervisar el rendimiento y la salud de los contenedores, así como establecer procedimientos de mantenimiento regular para actualizar imágenes y gestionar datos persistentes.
+
+            Ejemplos de herramientas de monitoreo:
+            \begin{itemize}
+                \item \textbf{Prometheus}: Sistema de monitoreo y alerta.
+                \item \textbf{cAdvisor}: Herramienta para monitorear el uso de recursos de los contenedores.
+                \item \textbf{Grafana}: Plataforma de visualización de datos.
+            \end{itemize}
+
+        \subsection{Script para el despliegue}
+
+            Para facilitar el proceso de despliegue, se ha creado un script llamado \textbf{setup.sh} que automatiza la construcción de la imagen y el levantamiento de los contenedores.
+
+            \vspace{0.3cm}
+            El contenido del script es el siguiente:
+
+            \begin{figure}[h!]
+                \centering
+                \includegraphics[width=0.8\textwidth]{images/setup.png}
+            \end{figure}
+
+            \vspace{0.3cm}
+            Este script permite ejecutar todo el proceso de dockerización con un solo comando, simplificando así el despliegue de la aplicación.
+
+        
+
+    % ================================= OPTIMIZACIONES Y MEJORAS
+    \newpage
+    \section{Optimizaciones y mejoras}
+
+        Para mejorar el rendimiento y la eficiencia de la imagen Docker y los contenedores, se pueden implementar varias optimizaciones durante la construcción del Dockerfile y la configuración de Docker Compose.
+
+        \subsection{Unificación de comandos en .sh}
+
+            Crear un script .sh que contenga todos los comandos necesarios para construir y ejecutar los contenedores, facilitando así el proceso de despliegue con un solo comando.
+
+            \vspace{0.3cm}
+            En el caso de este proyecto, se ha creado el archivo \textbf{setup.sh} que contiene los comandos para construir la imagen y levantar los contenedores.
+
+            \vspace{0.3cm}
+            Es un archivo sencillo que se puede realizar con cuidado mediante ayuda de IA y que facilita mucho el proceso de dockerización, además de evitar errores al escribir varios de los comandos manualmente.
+
+        \subsection{Optimización del Dockerfile}
+
+            \begin{itemize}
+                \item \textbf{Uso de imágenes base ligeras:} Elegir imágenes base que sean lo más pequeñas posible para reducir el tamaño final de la imagen.
+                \item \textbf{Minimización de capas:} Combinar múltiples comandos RUN en una sola instrucción para reducir el número de capas en la imagen.
+                \item \textbf{Eliminación de archivos innecesarios:} Utilizar .dockerignore para excluir archivos y directorios que no son necesarios en la imagen final.
+            \end{itemize}
+
+
+    % ================================= SEGUIRDAD
+    \newpage
+    \section{Seguridad}
+
+        Esta es una de las secciones que considero más importantes a la hora de dockerizar una aplicación, ya que si no se tienen en cuenta ciertos aspectos de seguridad, la aplicación puede quedar expuesta a ataques y vulnerabilidades.
+
+        Para garantizar la integridad y confidencialidad de los datos, resulta fundamental implementar buenas prácticas de seguridad en la configuración y gestión de los contenedores Docker.
+
+        Como por ejemplo, asegurarse de que el archivo .env no se suba a ningún repositorio público, ya que contiene información sensible como credenciales de la base de datos.
+
+        \subsection{Gestión de secretos}
+
+            Utilización de herramientas como Docker Secrets o Github Actions Secrets para gestionar credenciales y datos sensibles de forma segura.
+
+        \subsection{Usuarios no privilegiados}
+
+            Configurar los contenedores para que se ejecuten con usuarios no privilegiados, minimizando el riesgo de escalada de privilegios en caso de una brecha de seguridad.
+
+        \subsection{Escaneo de vulnerabilidades}
+
+            Implementar herramientas de escaneo de vulnerabilidades para identificar y mitigar posibles riesgos en las imágenes Docker utilizadas.
+
+            Algunas herramientas populares incluyen Trivy, Clair y Anchore.
+
+            \begin{itemize}
+                \item \textbf{Trivy}: Es una herramienta de escaneo de vulnerabilidades de código abierto que detecta vulnerabilidades en imágenes de contenedores, sistemas de archivos y repositorios de código.
+                \item \textbf{Clair}: Es una herramienta de análisis estático de vulnerabilidades para contenedores.
+                \item \textbf{Anchore}: Es una plataforma de análisis de seguridad de contenedores que ofrece escaneo de vulnerabilidades, cumplimiento de políticas y gestión de imágenes.
+            \end{itemize}
+
+        \subsection{Actualización de imágenes base}
+
+            Mantener las imágenes base actualizadas para beneficiarse de las últimas correcciones de seguridad y mejoras.
+
+            Para ello, se ha implementado la opción de que cada vez que se haga un push de este proyecto a GitHub, se construya y suba automáticamente la imagen Docker actualizada a Docker Hub mediante GitHub Actions; y a su vez, se envía un mensaje por telegram notificando que la imagen ha sido actualizada correctamente.
+
+
+
+    % ================================= TROUBLESHOOTING
+    \newpage
+    \section{Troubleshooting}
+
+        Durante el proceso de dockerización, pueden surgir diversos problemas que afectan al correcto funcionamiento de los contenedores. Esta sección aborda algunos de los problemas más comunes y sus soluciones.
+
+        \begin{tcolorbox}
+            \textbf{Troubleshooting} es el proceso de identificar, diagnosticar y resolver problemas técnicos en sistemas y aplicaciones. En el contexto de Docker, implica analizar errores en contenedores, imágenes o redes para restaurar su funcionamiento adecuado.
+        \end{tcolorbox}
+
+        \subsection{Problemas comunes}
+
+            \begin{itemize}
+                \item \textbf{Contenedor no inicia:} Verificar los logs del contenedor para identificar errores específicos.
+                \item \textbf{Problemas de conexión a la base de datos:} Asegurarse de que la cadena de conexión es correcta y que el contenedor de MongoDB está en ejecución.
+                \item \textbf{Errores de permisos:} Comprobar que los volúmenes y archivos tienen los permisos adecuados para ser accedidos por los contenedores.
+                \item \textbf{Problemas de red:} Verificar la configuración de redes en Docker Compose y asegurarse de que los contenedores pueden comunicarse entre sí.
+                \item \textbf{Problemas de dependencias:} Asegurarse de que todas las dependencias necesarias están instaladas en la imagen Docker.
+                \item \textbf{Errores en el Dockerfile:} Revisar la sintaxis y las instrucciones del Dockerfile para asegurarse de que son correctas.
+                \item \textbf{Problemas con Docker Compose:} Verificar la configuración del archivo docker-compose.yml para asegurarse de que todos los servicios están definidos correctamente.
+                \item \textbf{Problemas con credenciales:} Asegurarse de que las variables de entorno están configuradas correctamente y que las credenciales son válidas.
+            \end{itemize}
+
+        \subsection{Errores de conexión}
+
+        \begin{enumerate}
+            \item \textbf{Verificar estado de contenedores:} Usar \texttt{docker ps} para asegurarse de que ambos contenedores (API y MongoDB) están en ejecución.
+            \item \textbf{Revisar cadena de conexión:} Confirmar que la cadena de conexión a MongoDB utiliza el nombre del servicio correcto (por ejemplo, "mongo") y el puerto adecuado (27017).
+            \item \textbf{Comprobar logs:} Utilizar \texttt{docker logs <nombre\_contenedor>} para revisar los logs de la API y MongoDB en busca de errores relacionados con la conexión.
+            \item \textbf{Verificar redes:} Asegurarse de que ambos contenedores están en la misma red de Docker Compose y pueden comunicarse entre sí.
+            \item \textbf{Probar conectividad manualmente:} Acceder al contenedor de la API usando \texttt{docker exec -it <nombre\_contenedor> /bin/bash} y utilizar herramientas como \texttt{ping} para probar la conexión a MongoDB.
+            \item \textbf{Revisar configuración de firewall:} Asegurarse de que no hay reglas de firewall que bloqueen la comunicación entre los contenedores.
+        \end{enumerate}
+
+
+        \subsection{Problemas de permisos}
+
+            \begin{enumerate}
+                \item \textbf{Verificar permisos de volúmenes:} Asegurarse de que los volúmenes montados tienen los permisos adecuados para ser accedidos por los contenedores.
+                \item \textbf{Revisar usuario del contenedor:} Confirmar que el contenedor se está ejecutando con un usuario que tiene los permisos necesarios para acceder a los archivos y directorios.
+                \item \textbf{Ajustar permisos en el host:} Si es necesario, cambiar los permisos de los archivos y directorios en el host utilizando comandos como \texttt{chmod} o \texttt{chown}.
+                \item \textbf{Comprobar SELinux/AppArmor:} Si se utilizan sistemas de seguridad como SELinux o AppArmor, asegurarse de que no están bloqueando el acceso a los volúmenes. (No es el caso en este proyecto, pero es importante tenerlo en cuenta en otros entornos como Red Hat o CentOS, que son otras distribuciones de Linux con políticas de seguridad más estrictas).
+            \end{enumerate}
+
+        \subsection{Debugging de contenedores}
+
+            El Debugging de contenedores es el proceso de identificar y solucionar problemas dentro de contenedores Docker. Implica revisar logs, inspeccionar configuraciones y ejecutar comandos para diagnosticar fallos y restaurar el funcionamiento adecuado de los contenedores.
+
+            Es fundamental para mantener la estabilidad y rendimiento de aplicaciones que se ejecutan en entornos de contenedores.
+
+            \vspace{0.3cm}
+            Para ello, se pueden utilizar herramientas y comandos como \textbf{docker logs}, \textbf{docker exec} y \textbf{docker inspect} para obtener información detallada sobre el estado y comportamiento de los contenedores.
+
+            \vspace{0.3cm}
+            Por ejemplo, en este proyecto ha sido muy utilizado el comando
+            
+            \vspace{0.3cm}
+            \begin{center}
+                \texttt{docker logs <nombre\_contenedor>}
+            \end{center}
+            
+            \vspace{0.3cm}
+            para revisar los logs de ambos contenedores y solucionar posibles problemas.
+
+    % ================================= PROBLEMAS ENCONTRADOS
+    \newpage
+    \section{Problemas encontrados}
+        
+        Durante el proceso de dockerización, se han encontrado varios problemas que han requerido soluciones específicas para garantizar el correcto funcionamiento de la aplicación.
+
+        La mayoría de los problemas fueron solventados individualmente, pero al ir avanzando entre días en el proyecto, o me saltaba pasos sin darme cuenta, o cometia pequeños errores a la hora de introducir por terminal los comandos necesarios.
+
+        Así que para facilitar el proceso y evitar estos errores, se creó un script \textbf{setup.sh} que contiene todos los comandos necesarios para construir y ejecutar los contenedores, facilitando así el proceso de despliegue con un solo comando. Por lo que lo único que hay que hacer es ejecutar el script y todo se realiza automáticamente.
+
+        \subsection{Problema 1: Conexión a MongoDB fallida}
+
+            \textbf{Descripción:} La API no podía conectarse a la base de datos MongoDB, lo que resultaba en errores al intentar realizar operaciones CRUD.
+
+            \textbf{Causa:} La api se quedaba colgada, debido a que el contenedor de la base de datos no se estaba levantando correctamente, y por tanto, la API no podía establecer la conexión.
+
+            \textbf{Solución:} Se corrigió la cadena de conexión en las variables de entorno, asegurándose de utilizar el nombre del servicio "mongo" y el puerto correcto (27017). Además, se verificó que el contenedor de MongoDB estuviera en ejecución antes de iniciar la API, utilizando la opción \texttt{depends\_on} en el archivo docker-compose.yml.
+
+            \begin{tcolorbox}                
+                Uso del \textbf{healthcheck}: Esto garantiza que la base de datos esté lista para aceptar conexiones antes de que la API intente conectarse a ella. En el docker-compose.yml, se añadió la siguiente configuración al servicio de MongoDB:
+
+            \vspace{0.3cm}
+        \begin{verbatim}
+        mongo:
+            image: mongo:latest
+            container_name: mongo
+            volumes:
+            - mongo_data:/data/db
+            healthcheck:
+            test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+            interval: 5s
+            timeout: 3s
+            retries: 5
+        \end{verbatim}
+            \end{tcolorbox}
+
+        \subsection{Problema 2: Permisos insuficientes en volúmenes}
+
+            \textbf{Descripción:} El contenedor de MongoDB no podía acceder al volumen montado, lo que impedía la persistencia de datos.
+
+            \textbf{Causa:} Los permisos del directorio estaban partidos entre superusuario y usuario normal, lo que causaba conflictos al intentar acceder a los datos.
+
+            \textbf{Solución:} Se ajustaron los permisos del directorio en el host utilizando el comando \texttt{chmod} para asegurar la accesibilidad adecuada por parte del contenedor.
+
+        \subsection{Problema 3: Errores con la actualización de la imagen}
+
+            \textbf{Descripción:} La imagen Docker no se actualizaba correctamente al realizar cambios en el código.
+
+            \textbf{Causa:} Existia una mala estructuración del Dockerfile que impedía la correcta reconstrucción de la imagen. En el caso de este proyecto, el error concreto fue en el apartado CMD, que apuntaba a un script que no existía.
+
+            \textbf{Solución:} Se revisó y corrigió el Dockerfile para asegurar que todas las instrucciones fueran correctas y que la imagen se construyera adecuadamente. Además, se implementó un script de automatización para facilitar la reconstrucción y despliegue de la imagen.
+
+        \subsection{Problema 4: Conflictos de puertos}
+
+            \textbf{Descripción:} Al intentar iniciar los contenedores, se producían errores debido a conflictos de puertos en el host.
+
+            \textbf{Causa:} Otro servicio en el host ya estaba utilizando los puertos asignados a los contenedores, en este caso el puerto 3000 para la API.
+
+            \textbf{Solución:} Se modificaron los mapeos de puertos en el otro servicio que los tenía abiertos para evitar conflictos.disponibles.
+
+        \subsection{Problema 5: Actualización del tag en GitHub}
+
+            \textbf{Descripción:} Al realizar un push a GitHub, la imagen Docker no se actualizaba correctamente en Docker Hub.
+
+            \textbf{Causa:} El tag de la imagen no se estaba actualizando correctamente en el workflow de GitHub Actions. Esto era debido a que la versión del tag estaba hardcodeada en el archivo del workflow, en el que ponía siempre v1.0.0.
+
+            \textbf{Solución:} Se modificó el workflow para incluir un paso que actualizara el tag de la imagen con cada push, asegurando que la última versión de la imagen estuviera siempre disponible en Docker Hub.
+
+
+
+    % ================================= CONCLUSIONES
+    \newpage
+    \section{Conclusiones}
+
+        \subsection{Ventajas de la dockerización}
+
+            Este proyecto me ha permitido comprender las ventajas de la dockerización, tales como la portabilidad, escalabilidad y consistencia en los entornos de desarrollo y producción.
+
+            \vspace{0.3cm}
+            Es una herramienta que me está pareciendo fundamental para sobre todo la escalabilidad de aplicaciones, ya que permite desplegar múltiples instancias de una aplicación de manera sencilla y eficiente. Además, la seguridad que te aporta el hecho de aislar las aplicaciones en contenedores es un punto muy a favor.
+
+            \vspace{0.3cm}
+            Lo fundamental en mi caso ha sido el entender correctamente el fin que tiene cada parte y su orden en la dockerización.
+
+        \subsection{Resultados obtenidos}
+            
+            Pese a que en un principio pueda parecer un proceso complejo, una vez se entienden los conceptos básicos y se sigue un proceso estructurado, la dockerización de aplicaciones se vuelve mucho más manejable.
+
+            \vspace{0.3cm}
+            En un principio, tuve algunos fallos que me hicieron perder algo de tiempo, pero al ir entendiendo por mi cuenta las ventajas anteriormente mencionadas, y al ir corrigiendo los errores, me picó mucho la curiosidad por seguir aprendiendo sobre Docker y sus aplicaciones en el desarrollo de software.
+
+            \vspace{0.3cm}
+            Finalmente, he conseguido dockerizar correctamente una API con MongoDB, y he implementado un chatbot en Telegram para interactuar con la API.
+
+        \subsection{Ventajas del .sh}
+
+            La creación del script \textbf{setup.sh} ha sido una de las mejores decisiones que he tomado en este proyecto, ya que ha permitido automatizar el proceso de construcción y despliegue de los contenedores, evitando errores manuales y facilitando la repetición del proceso en el futuro.
+
+            \vspace{0.3cm}
+            Este archivo es sencillo de crear y puede ser muy útil en proyectos futuros donde se requiera dockerización.
+
+        \subsection{Trabajo adicional}
+
+            De forma adicional, por entretenimiento y para practicar más con Docker, he creado un repositorio público en GitHub donde he creado otro script que muestra información relevante de Docker de manera visual y sencilla, llamado \textbf{dockerinfo}.
+            
+            \vspace{0.3cm}
+            Aquí lo dejo por si alguien quiere echarle un vistazo: \href{https://github.com/santimartinezzgb/dockerinfo}{dockerinfo - santimartinezzgb}.
+
+
+    % ================================= REFERENCIAS
+    \newpage
+    \section{Referencias}
+
+            1. \textbf{Documentación oficial de Docker:} \href{https://docs.docker.com/}{https://docs.docker.com/}
+
+            \vspace{0.3cm}
+            2. \textbf{Documentación oficial de Docker Compose:} \href{https://docs.docker.com/compose/}{https://docs.docker.com/compose/}  
+
+            \vspace{0.3cm}
+            3. \textbf{Documentación oficial de Telegram Bots:} \href{https://core.telegram.org/bots}{https://core.telegram.org/bots}
+
+            \vspace{0.3cm}
+            4. \textbf{GitHub Actions Documentation:} \href{https://docs.github.com/en/actions}{https://docs.github.com/en/actions}
+
+
+\end{document}
